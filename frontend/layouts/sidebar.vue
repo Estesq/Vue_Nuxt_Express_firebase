@@ -4,7 +4,7 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="text-h6" v-text="title" />
-          <v-list-item-subtitle> {{ user }} </v-list-item-subtitle>
+          <v-list-item-subtitle> {{ userName }} </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
@@ -47,7 +47,9 @@
 
       <v-toolbar-title v-text="title" />
       <v-spacer></v-spacer>
-      <v-btn text>{{ user }}</v-btn>
+      <v-btn text
+        ><v-avatar><v-img :src="userPic"></v-img></v-avatar
+      ></v-btn>
       <v-icon medium color="red" @click="logout">mdi-logout</v-icon>
     </v-app-bar>
 
@@ -70,8 +72,12 @@ export default {
         icon: 'mdi-shape',
         items: [
           { title: 'Add', action: 'mdi-plus-box', link: '/category-add' },
-          { title: 'Update', action: 'mdi-update', link: '#' },
-          { title: 'Delete', action: 'mdi-delete-forever', link: '#' },
+          { title: 'Update', action: 'mdi-update', link: '/category-update' },
+          {
+            title: 'Delete',
+            action: 'mdi-delete-forever',
+            link: '/category-delete',
+          },
         ],
       },
       {
@@ -79,16 +85,36 @@ export default {
         icon: 'mdi-store',
         items: [
           { title: 'Add', action: 'mdi-plus-box', link: '/product-add' },
-          { title: 'Update', action: 'mdi-update', link: '#' },
-          { title: 'Delete', action: 'mdi-delete-forever', link: '#' },
+          { title: 'Update', action: 'mdi-update', link: '/product-update' },
+          {
+            title: 'Delete',
+            action: 'mdi-delete-forever',
+            link: '/product-delete',
+          },
         ],
+      },
+      {
+        title: 'Settings',
+        icon: 'mdi-shield-account',
+        link: '/settings-profile',
       },
       { title: 'About', icon: 'mdi-help-box' },
     ],
   }),
   computed: {
-    user() {
-      return this.$auth.user.email.split('@')[0]
+    userPic() {
+      return this.$auth.user.photoURL
+        ? this.$auth.user.photoURL
+        : this.$auth.user.displayName
+        ? `https://ui-avatars.com/api/?name=${this.$auth.user.displayName}`
+        : `https://ui-avatars.com/api/?name=${
+            this.$auth.user.email.split('@')[0]
+          }`
+    },
+    userName() {
+      return this.$auth.user.displayName
+        ? this.$auth.user.displayName
+        : this.$auth.user.email.split('@')[0]
     },
   },
   methods: {
@@ -101,5 +127,11 @@ export default {
 <style>
 .noindicator .v-list-item .v-list-item__icon {
   display: none;
+}
+.noindicator .v-list-group__header {
+  padding: 0;
+}
+.noindicator .v-list-group__header .v-list-item {
+  padding: 0 32px;
 }
 </style>

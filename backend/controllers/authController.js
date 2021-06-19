@@ -1,5 +1,10 @@
+const db = require('../db')
 const authModel = require('../models/authModel')
-
+const MIME_TYPES = {
+  'image/jpg': '.jpg',
+  'image/jpeg': '.jpg',
+  'image/png': '.png'
+}
 exports.signin = async (req, res) => {
   try {
     let result = await authModel.firebase.signInWithEmailAndPassword(
@@ -28,8 +33,8 @@ exports.register = async (req, res) => {
 }
 exports.userInfo = async (req, res) => {
   if (await req.user) {
-    console.log(req.user)
-    res.send({ user: req.user })
+    let userinfo = await authModel.admin.getUser(req.user.uid)
+    res.send({ user: userinfo })
   } else {
     res.send({ error: "You aren't authorized" })
   }
@@ -37,3 +42,31 @@ exports.userInfo = async (req, res) => {
 exports.signout = (req, res) => {
   res.send({ token: null })
 }
+exports.updateProfile = async (req, res) => {
+  await authModel.admin.updateUser(req.user.uid, req.body)
+  res.send({ message: 'Updation successful!' })
+}
+exports.updateProfilePic = async (req, res) => {
+  let bucket = db.sBucket.bucket('zpay-a2806.appspot.com')
+  let file = req.file
+  let fileUpload = bucket.file(
+    file.originalname + Date.now() + MIME_TYPES[file.mimetype]
+  )
+  const blobStream = fileUpload.createWriteStream({
+    metadata: {
+      contentType: file.mimetype
+    }
+  })
+  blobStream.on('error', error => {
+    console.error(error)
+  })
+  blobStream.on('finish', async () => {})
+  blobStream.end(file.buffer)
+  await authModel.admin.updateUser(req.user.uid, {
+    photoURL: `https://firebasestorage.googleapis.com/v0/b/${
+      bucket.name
+    }/o/${encodeURI(fileUpload.name)}?alt=media`
+  })
+  res.send({ message: 'Updation successful!' })
+}
+exports.removePic = async (req, res) => {}

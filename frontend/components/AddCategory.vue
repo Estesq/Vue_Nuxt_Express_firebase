@@ -1,6 +1,10 @@
 <template>
-  <v-form v-model="valid" @submit.prevent="addCategory({ name, subcategory })">
-    <v-container>
+  <v-container>
+    <v-form
+      ref="form"
+      v-model="valid"
+      @submit.prevent="newCategory({ name, subcategory })"
+    >
       <v-row>
         <v-col cols="12" md="5">
           <v-text-field
@@ -27,15 +31,15 @@
           <v-btn type="submit" dense>Add Category</v-btn>
         </v-col>
       </v-row>
-    </v-container>
-  </v-form>
+    </v-form>
+  </v-container>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
 export default {
   data: () => ({
-    valid: false,
+    valid: true,
     name: '',
     subcategory: '',
     nameRules: [
@@ -48,7 +52,17 @@ export default {
     ],
   }),
   methods: {
-    ...mapActions('category', ['addCategory']),
+    ...mapActions('category', ['addCategory', 'myCategories']),
+    newCategory(data) {
+      if (this.valid) {
+        this.addCategory(data)
+          .then((res) => this.$toast.success(res).goAway(3000))
+          .then(() => this.myCategories())
+        this.name = ''
+        this.subcategory = ''
+        this.$refs.form.resetValidation()
+      }
+    },
   },
 }
 </script>

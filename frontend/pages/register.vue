@@ -6,9 +6,10 @@
 
         <v-divider class="mt-5 mb-5" />
         <v-form
+          ref="form"
           justify="center"
           align="center"
-          @submit.prevent="register({ email, password })"
+          @submit.prevent="addUser({ email, password })"
         >
           <v-text-field
             v-model="email"
@@ -61,6 +62,20 @@ export default {
   },
   methods: {
     ...mapActions('user', ['register']),
+    addUser({ email, password }) {
+      try {
+        this.register({ email, password })
+          .then((res) => {
+            if (res.data.error) {
+              console.log(res.data.error)
+              this.$toast.error(`😔 ${res.data.error.message}`).goAway(3000)
+            } else {
+              this.$toast.success(`🏆${res.data.message}`).goAway(3000)
+            }
+          })
+          .then(() => this.$refs.form.reset())
+      } catch (error) {}
+    },
   },
 }
 </script>

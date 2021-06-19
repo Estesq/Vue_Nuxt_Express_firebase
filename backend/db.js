@@ -1,4 +1,5 @@
 const { default: firebase } = require('firebase')
+const { Storage } = require('@google-cloud/storage')
 var admin = require('firebase-admin')
 const db = admin.initializeApp({
   credential: admin.credential.applicationDefault(),
@@ -15,4 +16,9 @@ const app = firebase.initializeApp({
   appId: '1:959593349545:web:fa466c723aab24efea44b8',
   measurementId: 'G-6TL45L5SG6'
 })
-module.exports = { db, app }
+const sBucket = new Storage({
+  projectId: 'zpay-a2806',
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+})
+
+module.exports = { db, app, sBucket }

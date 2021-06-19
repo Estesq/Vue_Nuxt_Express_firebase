@@ -5,7 +5,12 @@
         <div class="text-h4 text-center">Login</div>
 
         <v-divider class="mt-5 mb-5" />
-        <v-form justify="center" align="center" @submit.prevent="userLogin">
+        <v-form
+          ref="form"
+          justify="center"
+          align="center"
+          @submit.prevent="userLogin"
+        >
           <v-text-field
             v-model="email"
             label="Email"
@@ -56,9 +61,21 @@ export default {
   methods: {
     async userLogin() {
       try {
-        const response = await this.$auth.loginWith('local', {
-          data: { email: this.email, password: this.password },
-        })
+        const response = await this.$auth
+          .loginWith('local', {
+            data: { email: this.email, password: this.password },
+          })
+          .then((res) => {
+            console.log(res.data)
+
+            if (res.data.error) {
+              this.$toast.error(`😔 ${res.data.error.message}`).goAway(3000)
+            } else {
+              this.$toast.success(`🏆 Login Successful!`).goAway(3000)
+            }
+          })
+          .then(() => this.$refs.form.reset())
+
         await this.$auth.setUserToken(
           response.data.token,
           response.data.refreshToken

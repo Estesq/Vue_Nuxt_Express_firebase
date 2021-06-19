@@ -30,3 +30,17 @@ exports.myCategoryList = async (req, res) => {
     return res.send({ error })
   }
 }
+exports.removeCategory = async (req, res) => {
+  console.log(req.body.deleteId)
+  await categoryModel.doc(req.body.deleteId).delete()
+  res.send({
+    message: 'Category deleted succefully!'
+  })
+}
+
+exports.updateCategory = async (req, res) => {
+  await categoryModel.doc(req.body.updateId).update(req.body.category)
+  res.send({
+    message: 'Category updated succefully!'
+  })
+}

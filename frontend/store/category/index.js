@@ -2,6 +2,7 @@
 const state = () => ({
   category: [],
   message: null,
+  error: null,
   counts: 0,
 })
 const getters = {
@@ -9,7 +10,7 @@ const getters = {
     return state.category
   },
   getCategoryCounts (state) {
-    return state.counts
+    return state.counts ? state.counts : '0'
   },
   getDistinctSubcategories (state) {
     return state.category
@@ -40,7 +41,28 @@ const actions = {
   },
   async myCategories ({ commit }) {
     const result = await this.$axios.get('http://localhost:8989/category/my')
-    commit('loadCategories', result.data)
+    if (!result.data.error) {
+      commit('loadCategories', result.data)
+    } else {
+      commit('loadCategories', [])
+    }
+    return result.data
+  },
+  async removeCategory ({ commit }, index) {
+    console.log(index)
+    const result = await this.$axios.post(
+      'http://localhost:8989/category/delete',
+      index
+    )
+    commit('deleteCategory', result.data)
+    return result.data
+  },
+  async updateCategory ({ commit }, data) {
+    const result = await this.$axios.post(
+      'http://localhost:8989/category/update',
+      { updateId: data.index, category: data.category }
+    )
+    commit('editCategory', result.data)
     return result.data
   },
 }
@@ -51,6 +73,12 @@ const mutations = {
   loadCategories (state, data) {
     state.category = data
     state.counts = data.length
+  },
+  deleteCategory (state, data) {
+    state.message = data
+  },
+  editCategory (state, data) {
+    state.message = data
   },
 }
 export default {

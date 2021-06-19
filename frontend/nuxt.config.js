@@ -34,7 +34,7 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios', '@nuxtjs/auth-next'],
+  modules: ['@nuxtjs/axios', '@nuxtjs/auth-next', '@nuxtjs/toast'],
   axios: {
     baseURL: 'http://localhost:8989', // Used as fallback if no runtime config is provided
   },
@@ -49,10 +49,11 @@ export default {
         },
         user: {
           property: 'user',
+          autoFetch: true,
         },
         endpoints: {
           login: { url: '/auth/login', method: 'post' },
-          user: { url: '/auth/user', method: 'get' },
+          user: { url: '/auth/user', method: 'get', propertyName: false },
           logout: false,
         },
       },
@@ -68,7 +69,9 @@ export default {
   router: {
     middleware: ['auth'],
   },
-
+  toast: {
+    position: 'top-center',
+  },
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
